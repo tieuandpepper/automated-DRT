@@ -1,25 +1,28 @@
-# from galvani import BioLogic
-# import pandas as pd
-# import matplotlib.pyplot as plt
-
-# mpr_file = BioLogic.MPRfile('LZ019NMC(5.5)(5-16in)SC3UA80_14MPa_cell2_14_PEIS_C02.mpr')
-# df = pd.DataFrame(mpr_file.data)
-# print(df.describe())
-# # print(df["Re(Z)/Ohm"])
-# print(df["-Im(Z)/Ohm"])
-# fig,ax = plt.subplots()
-# ax.scatter(df["Re(Z)/Ohm"],df["-Im(Z)/Ohm"])
-# plt.show()
-
 # import OS
 import os
 import pandas as pd
 from galvani import BioLogic
 
 list_files = []
-for x in os.listdir():
-    if x.endswith("jdb11-1_c3_gcpl_5cycles_2V-3p8V_C-24_data_C09.mpr"):
+
+###################################################################
+# USE THIS PART AS INPUT. DON'T CHANGE OTHER PARTS IF NOT NECESSARY
+start_data_path = "data"
+final_path = "data_parsed/"
+columns_to_convert = ["freq/Hz", "Re(Z)/Ohm", "-Im(Z)/Ohm"]
+file_type = "txt"
+keeping_header = False
+using_index = False
+separator = " "
+###################################################################
+
+for x in os.listdir(start_data_path):
+    if x.endswith(".mpr"):
         list_files.append(x)
-        file = BioLogic.MPRfile(x)
+        file = BioLogic.MPRfile(start_data_path + "/" + x)
         df = pd.DataFrame(file.data)
-        df.to_csv(x[:-3] + 'csv')
+        filename = final_path + x[:-3] + file_type
+        if len(columns_to_convert) == 0:
+            df.to_csv(filename,index=using_index, header=keeping_header, sep= separator)
+        else:
+            df[columns_to_convert].to_csv(filename,index=using_index, header=keeping_header, sep= separator)
